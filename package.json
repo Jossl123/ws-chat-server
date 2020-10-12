@@ -1,0 +1,17 @@
+{
+  "name": "ws-chat",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --trace-warnings index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "net": "^1.0.2",
+    "websocket": "^1.0.32",
+    "ws": "^7.3.1"
+  }
+}
