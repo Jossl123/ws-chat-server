@@ -43,13 +43,11 @@ wss.on("connection", ws => {
             });
         } else if (data.type == "typing") {
             wss.clients.forEach(function e(client) {
-                if (client != ws) {
-                    client.send(JSON.stringify({
-                        type: data.type,
-                        data: data.data,
-                        name: data.name
-                    }));
-                };
+                client.send(JSON.stringify({
+                    type: data.type,
+                    data: data.data,
+                    name: data.name
+                }));
             });
         }
     });
