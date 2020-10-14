@@ -37,7 +37,7 @@ wss.on("connection", ws => {
             } else {
                 ws.send(JSON.stringify({
                     type: "nameInvalid",
-                    userConnected: userConnected
+                    onlineUser: userConnected
                 }))
             }
 
@@ -72,7 +72,7 @@ wss.on("connection", ws => {
                 client.send(JSON.stringify({
                     type: data.type,
                     name: data.name,
-                    userConnected: userConnected
+                    onlineUser: userConnected
                 }));
                 console.log(`${data.name} is disconnecting`)
             });
