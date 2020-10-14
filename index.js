@@ -15,7 +15,7 @@ wss.on("connection", ws => {
         if (data.type == "newConnection") {
 
             if (!userConnected.includes(data.name)) {
-                userConnected[userConnected.length] = data.name;
+                userConnected.push(data.name)
                 wss.clients.forEach(function e(client) {
                     if (client != ws) {
                         client.send(JSON.stringify({
@@ -68,6 +68,7 @@ wss.on("connection", ws => {
                 }));
             });
         } else if (data.type == "disconnecting") {
+			userConnected.splice(userConnected.indexOf(data.name), 1);
             wss.clients.forEach(function e(client) {
                 client.send(JSON.stringify({
                     type: data.type,
@@ -80,11 +81,6 @@ wss.on("connection", ws => {
     });
 
     ws.on("close", () => {
-        for (let i = userConnected.indexOf(ws.name); i < userConnected.length; i++) {
-            userConnected[i] = userConnected[i + 1];
-        }
-        userConnected.pop();
-
         console.log("A client just disconnected");
     })
 });
