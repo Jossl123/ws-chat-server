@@ -13,7 +13,6 @@ wss.on("connection", ws => {
         data = JSON.parse(data);
 
         if (data.type == "newConnection") {
-
             if (!userConnected.includes(data.name)) {
                 userConnected.push(data.name)
                 wss.clients.forEach(function e(client) {
@@ -40,7 +39,17 @@ wss.on("connection", ws => {
                     onlineUser: userConnected
                 }))
             }
-
+        } else if (data.type == "editNick") {
+            userConnected.splice(userConnected.indexOf(data.oldName), 1, data.newName);
+            wss.clients.forEach(function e(client) {
+                client.send(JSON.stringify({
+                    type: data.type,
+                    oldName: data.oldName,
+                    newName: data.newName,
+                    onlineUser: userConnected
+                }));
+                console.log(`${data.oldName} changed his nickname to ${data.newName}`)
+            });
         } else if (data.type == "message") {
             wss.clients.forEach(function e(client) {
                 if (client != ws) {
