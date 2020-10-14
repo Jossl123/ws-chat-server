@@ -71,7 +71,8 @@ wss.on("connection", ws => {
             wss.clients.forEach(function e(client) {
                 client.send(JSON.stringify({
                     type: data.type,
-                    name: data.name
+                    name: data.name,
+                    userConnected: userConnected
                 }));
                 console.log(`${data.name} is disconnecting`)
             });
