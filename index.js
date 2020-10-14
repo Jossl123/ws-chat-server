@@ -67,6 +67,14 @@ wss.on("connection", ws => {
                     name: data.name
                 }));
             });
+        } else if (data.type == "disconnecting") {
+            wss.clients.forEach(function e(client) {
+                client.send(JSON.stringify({
+                    type: data.type,
+                    name: data.name
+                }));
+                console.log(`${data.name} is disconnecting`)
+            });
         }
     });
 
@@ -76,13 +84,7 @@ wss.on("connection", ws => {
         }
         userConnected.pop();
 
-        wss.clients.forEach(function e(client) {
-            client.send(JSON.stringify({
-                type: "LostAClient",
-                data: userConnected
-            }));
-        });
-        console.log("We lost a client");
+        console.log("A client just disconnected");
     })
 });
 
