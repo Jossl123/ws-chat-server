@@ -60,7 +60,6 @@ wss.on("connection", ws => {
                 };
             });
         } else if (data.type == "typing") {
-            console.log(data.data)
             wss.clients.forEach(function e(client) {
                 client.send(JSON.stringify({
                     type: data.type,
