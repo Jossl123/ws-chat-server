@@ -14,8 +14,6 @@ wss.on("connection", ws => {
 
         if (data.type == "newConnection") {
 
-            console.log(userConnected);
-
             if (!userConnected.includes(data.name)) {
                 userConnected[userConnected.length] = data.name;
                 wss.clients.forEach(function e(client) {
@@ -27,6 +25,7 @@ wss.on("connection", ws => {
                             onlineUser: userConnected
                         }));
                     } else {
+                        ws.name = data.name
                         client.send(JSON.stringify({
                             type: "connected",
                             data: data.name,
@@ -35,7 +34,6 @@ wss.on("connection", ws => {
                         }));
                     };
                 });
-                console.log(userConnected);
             } else {
                 ws.send(JSON.stringify({
                     type: "nameInvalid",
@@ -62,6 +60,7 @@ wss.on("connection", ws => {
                 };
             });
         } else if (data.type == "typing") {
+            console.log(data.data)
             wss.clients.forEach(function e(client) {
                 client.send(JSON.stringify({
                     type: data.type,
@@ -73,10 +72,11 @@ wss.on("connection", ws => {
     });
 
     ws.on("close", () => {
-        for (let i = userConnected.indexOf(ws.nick); i < userConnected.length; i++) {
+        for (let i = userConnected.indexOf(ws.name); i < userConnected.length; i++) {
             userConnected[i] = userConnected[i + 1];
         }
         userConnected.pop();
+
         wss.clients.forEach(function e(client) {
             client.send(JSON.stringify({
                 type: "LostAClient",
