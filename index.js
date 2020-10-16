@@ -17,21 +17,11 @@ wss.on("connection", ws => {
                 if (!userConnected.includes(data.name)) {
                     userConnected.push(data.name)
                     wss.clients.forEach(function e(client) {
-                        if (client != ws) {
-                            client.send(JSON.stringify({
-                                type: data.type,
-                                name: data.name,
-                                data: data.msg,
-                                nameColor: data.nameColor
-                            }));
-                        } else {
-                            client.send(JSON.stringify({
-                                type: data.type,
-                                name: "You",
-                                data: data.msg,
-                                nameColor: data.nameColor
-                            }));
-                        };
+                        client.send(JSON.stringify({
+                            type: data.type,
+                            name: data.name,
+                            nameColor: data.nameColor
+                        }));
                     });
                 } else {
                     ws.send(JSON.stringify({
