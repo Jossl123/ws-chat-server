@@ -15,12 +15,13 @@ wss.on("connection", ws => {
         switch (data.type) {
             case "newConnection":
                 if (!userConnected.includes(data.name)) {
-                    userConnected.push(data.name)
+                    userConnected.push(data.name);
                     wss.clients.forEach(function e(client) {
                         client.send(JSON.stringify({
                             type: data.type,
                             name: data.name,
-                            nameColor: data.nameColor
+                            nameColor: data.nameColor,
+                            onlineUser: userConnected
                         }));
                     });
                 } else {
@@ -32,7 +33,7 @@ wss.on("connection", ws => {
 
                 break;
 
-            case "editNcik":
+            case "editNick":
                 userConnected.splice(userConnected.indexOf(data.oldName), 1, data.newName);
                 wss.clients.forEach(function e(client) {
                     client.send(JSON.stringify({
@@ -57,8 +58,9 @@ wss.on("connection", ws => {
                     } else {
                         client.send(JSON.stringify({
                             type: data.type,
-                            data: data.data,
-                            name: data.name
+                            data: data.msg,
+                            name: "You",
+                            nameColor: data.nameColor
                         }));
                     };
                 });
