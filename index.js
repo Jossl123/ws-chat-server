@@ -14,33 +14,45 @@ wss.on("connection", ws => {
 
         switch (data.type) {
             case "newConnection":
-
                 if (!userConnected.includes(data.name)) {
-                    userConnected[userConnected.length] = data.name;
+                    userConnected.push(data.name)
                     wss.clients.forEach(function e(client) {
                         if (client != ws) {
                             client.send(JSON.stringify({
-                                type: "newConnection",
-                                data: data.name,
-                                nameColor: data.nameColor,
-                                onlineUser: userConnected
+                                type: data.type,
+                                name: data.name,
+                                data: data.msg,
+                                nameColor: data.nameColor
                             }));
                         } else {
-                            ws.name = data.name
                             client.send(JSON.stringify({
-                                type: "connected",
-                                data: data.name,
-                                nameColor: data.nameColor,
-                                onlineUser: userConnected
+                                type: data.type,
+                                name: "You",
+                                data: data.msg,
+                                nameColor: data.nameColor
                             }));
                         };
                     });
                 } else {
                     ws.send(JSON.stringify({
                         type: "nameInvalid",
-                        userConnected: userConnected
+                        onlineUser: userConnected
                     }))
                 }
+
+                break;
+
+            case "editNcik":
+                userConnected.splice(userConnected.indexOf(data.oldName), 1, data.newName);
+                wss.clients.forEach(function e(client) {
+                    client.send(JSON.stringify({
+                        type: data.type,
+                        oldName: data.oldName,
+                        newName: data.newName,
+                        onlineUser: userConnected
+                    }));
+                    console.log(`${data.oldName} changed his nickname to ${data.newName}`)
+                });
                 break;
 
             case "message":
@@ -55,9 +67,8 @@ wss.on("connection", ws => {
                     } else {
                         client.send(JSON.stringify({
                             type: data.type,
-                            name: "You",
-                            data: data.msg,
-                            nameColor: data.nameColor
+                            data: data.data,
+                            name: data.name
                         }));
                     };
                 });
@@ -73,24 +84,25 @@ wss.on("connection", ws => {
                 });
                 break;
 
+            case "disconnecting":
+                userConnected.splice(userConnected.indexOf(data.name), 1);
+                wss.clients.forEach(function e(client) {
+                    client.send(JSON.stringify({
+                        type: data.type,
+                        name: data.name,
+                        onlineUser: userConnected
+                    }));
+                    console.log(`${data.name} is disconnecting`)
+                });
+                break;
+
             default:
                 break;
         }
     });
 
     ws.on("close", () => {
-        for (let i = userConnected.indexOf(ws.name); i < userConnected.length; i++) {
-            userConnected[i] = userConnected[i + 1];
-        }
-        userConnected.pop();
-
-        wss.clients.forEach(function e(client) {
-            client.send(JSON.stringify({
-                type: "LostAClient",
-                data: userConnected
-            }));
-        });
-        console.log("We lost a client");
+        console.log("A client just disconnected");
     })
 });
 
