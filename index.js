@@ -12,61 +12,69 @@ wss.on("connection", ws => {
 
         data = JSON.parse(data);
 
-        if (data.type == "newConnection") {
+        switch (data.type) {
+            case "newConnection":
 
-            if (!userConnected.includes(data.name)) {
-                userConnected[userConnected.length] = data.name;
+                if (!userConnected.includes(data.name)) {
+                    userConnected[userConnected.length] = data.name;
+                    wss.clients.forEach(function e(client) {
+                        if (client != ws) {
+                            client.send(JSON.stringify({
+                                type: "newConnection",
+                                data: data.name,
+                                nameColor: data.nameColor,
+                                onlineUser: userConnected
+                            }));
+                        } else {
+                            ws.name = data.name
+                            client.send(JSON.stringify({
+                                type: "connected",
+                                data: data.name,
+                                nameColor: data.nameColor,
+                                onlineUser: userConnected
+                            }));
+                        };
+                    });
+                } else {
+                    ws.send(JSON.stringify({
+                        type: "nameInvalid",
+                        userConnected: userConnected
+                    }))
+                }
+                break;
+
+            case "message":
                 wss.clients.forEach(function e(client) {
                     if (client != ws) {
                         client.send(JSON.stringify({
-                            type: "newConnection",
-                            data: data.name,
-                            nameColor: data.nameColor,
-                            onlineUser: userConnected
+                            type: data.type,
+                            name: data.name,
+                            data: data.msg,
+                            nameColor: data.nameColor
                         }));
                     } else {
-                        ws.name = data.name
                         client.send(JSON.stringify({
-                            type: "connected",
-                            data: data.name,
-                            nameColor: data.nameColor,
-                            onlineUser: userConnected
+                            type: data.type,
+                            name: "You",
+                            data: data.msg,
+                            nameColor: data.nameColor
                         }));
                     };
                 });
-            } else {
-                ws.send(JSON.stringify({
-                    type: "nameInvalid",
-                    userConnected: userConnected
-                }))
-            }
+                break;
 
-        } else if (data.type == "message") {
-            wss.clients.forEach(function e(client) {
-                if (client != ws) {
+            case "typing":
+                wss.clients.forEach(function e(client) {
                     client.send(JSON.stringify({
                         type: data.type,
-                        name: data.name,
-                        data: data.msg,
-                        nameColor: data.nameColor
+                        data: data.data,
+                        name: data.name
                     }));
-                } else {
-                    client.send(JSON.stringify({
-                        type: data.type,
-                        name: "You",
-                        data: data.msg,
-                        nameColor: data.nameColor
-                    }));
-                };
-            });
-        } else if (data.type == "typing") {
-            wss.clients.forEach(function e(client) {
-                client.send(JSON.stringify({
-                    type: data.type,
-                    data: data.data,
-                    name: data.name
-                }));
-            });
+                });
+                break;
+
+            default:
+                break;
         }
     });
 
