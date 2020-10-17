@@ -3,6 +3,7 @@ const WebSocket = require("ws");
 const wss = new WebSocket.Server({ port: 9898 });
 
 let userConnected = [];
+let serversListAvaible = [];
 
 wss.on("connection", ws => {
 
@@ -21,7 +22,8 @@ wss.on("connection", ws => {
                             type: data.type,
                             name: data.name,
                             nameColor: data.nameColor,
-                            onlineUser: userConnected
+                            onlineUser: userConnected,
+                            serversListAvaible: serversListAvaible
                         }));
                     });
                 } else {
@@ -85,6 +87,16 @@ wss.on("connection", ws => {
                         onlineUser: userConnected
                     }));
                     console.log(`${data.name} is disconnecting`)
+                });
+                break;
+
+            case "newServer":
+                serversListAvaible[serversListAvaible.length] = data.serverName;
+                wss.clients.forEach(function e(client) {
+                    client.send(JSON.stringify({
+                        type: data.type,
+                        serversListAvaible: serversListAvaible
+                    }));
                 });
                 break;
 
