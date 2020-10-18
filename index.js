@@ -102,10 +102,12 @@ wss.on("connection", ws => {
                 break;
 
             case "newServerUsers":
-                serversListUser[serversListUser.length] = data.serverName;
-                console.log(serversListUser);
+                if (!serversListUser.includes(data.serverName)) {
+                    serversListUser[serversListUser.length] = data.serverName;
+                }
                 ws.send(JSON.stringify({
                     type: data.type,
+                    serverName: data.serverName,
                     serversListUser: serversListUser
                 }))
                 break;
