@@ -4,6 +4,7 @@ const wss = new WebSocket.Server({ port: 9898 });
 
 let userConnected = [];
 let serversListAvaible = [];
+let serversListUser = [];
 
 wss.on("connection", ws => {
 
@@ -98,6 +99,15 @@ wss.on("connection", ws => {
                         serversListAvaible: serversListAvaible
                     }));
                 });
+                break;
+
+            case "newServerUsers":
+                serversListUser[serversListUser.length] = data.serverName;
+                console.log(serversListUser);
+                ws.send(JSON.stringify({
+                    type: data.type,
+                    serversListUser: serversListUser
+                }))
                 break;
 
             default:
